@@ -21,14 +21,48 @@ function validate(f: FormData) {
   return e
 }
 
+interface FieldProps {
+  name: string
+  label: string
+  required?: boolean
+  placeholder?: string
+  type?: string
+  value: string
+  error?: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function Field({ name, label, required = true, placeholder = '', type = 'text', value, error, onChange }: FieldProps) {
+  return (
+    <div className={styles.fieldGroup}>
+      <label className={styles.label} htmlFor={name}>
+        {label}
+        {required ? <span className={styles.req}> *</span> : <span className={styles.opt}>optionnel</span>}
+      </label>
+      <input
+        id={name}
+        type={type}
+        className={`${styles.input} ${error ? styles.inputErr : ''}`}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+      />
+      {error && <span className={styles.errMsg}>⚠ {error}</span>}
+    </div>
+  )
+}
+
 export default function FormPage({ onBack }: Props) {
-  const [form, setForm] = useState<FormData>({ nom: '', prenom: '', institution: '', email: '', telephone: '', adresse: '', ligne_directe: '' })
+  const [form, setForm] = useState<FormData>({
+    nom: '', prenom: '', institution: '',
+    email: '', telephone: '', adresse: '', ligne_directe: ''
+  })
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [serverError, setServerError] = useState('')
 
-  const set = (name: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (name: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(f => ({ ...f, [name]: e.target.value }))
     if (errors[name]) setErrors(er => ({ ...er, [name]: undefined }))
   }
@@ -58,25 +92,6 @@ export default function FormPage({ onBack }: Props) {
     }
   }
 
-  const Field = ({ name, label, required = true, placeholder = '', type = 'text' }: {
-    name: keyof FormData; label: string; required?: boolean; placeholder?: string; type?: string
-  }) => (
-    <div className={styles.fieldGroup}>
-      <label className={styles.label}>
-        {label}
-        {required ? <span className={styles.req}> *</span> : <span className={styles.opt}>optionnel</span>}
-      </label>
-      <input
-        type={type}
-        className={`${styles.input} ${errors[name] ? styles.inputErr : ''}`}
-        value={form[name]}
-        onChange={set(name)}
-        placeholder={placeholder}
-      />
-      {errors[name] && <span className={styles.errMsg}>⚠ {errors[name]}</span>}
-    </div>
-  )
-
   if (submitted) return (
     <div className={styles.page}>
       <div className={styles.successCard}>
@@ -87,8 +102,15 @@ export default function FormPage({ onBack }: Props) {
           Nous vous attendons le <strong>26 juin 2026 à 16h00</strong> !
         </p>
         <div className={styles.successDetail}>
-          {[['Nom', `${form.prenom} ${form.nom}`], ['Institution', form.institution], ['Date', '26 juin 2026 — 16h00'], ['Lieu', 'Bât G, Rue des châteaux Saint-Sylvère, 95000 Cergy']].map(([l, v]) => (
-            <div key={l} className={styles.successRow}><span className={styles.successLabel}>{l}</span><span>{v}</span></div>
+          {[
+            ['Nom', `${form.prenom} ${form.nom}`],
+            ['Institution', form.institution],
+            ['Date', '26 juin 2026 — 16h00'],
+            ['Lieu', 'Bât G, Rue des châteaux Saint-Sylvère, 95000 Cergy']
+          ].map(([l, v]) => (
+            <div key={l} className={styles.successRow}>
+              <span className={styles.successLabel}>{l}</span><span>{v}</span>
+            </div>
           ))}
         </div>
         <button className={styles.btn} onClick={onBack} style={{ marginTop: 20 }}>Retour à l'accueil</button>
@@ -109,20 +131,28 @@ export default function FormPage({ onBack }: Props) {
 
         <div className={styles.sectionTitle}>Informations personnelles</div>
         <div className={styles.row}>
-          <Field name="prenom" label="Prénom" placeholder="Marie" />
-          <Field name="nom" label="Nom" placeholder="Dupont" />
+          <Field name="prenom" label="Prénom" placeholder="Marie"
+            value={form.prenom} error={errors.prenom} onChange={handleChange('prenom')} />
+          <Field name="nom" label="Nom" placeholder="Dupont"
+            value={form.nom} error={errors.nom} onChange={handleChange('nom')} />
         </div>
 
         <div className={styles.sectionTitle}>Coordonnées professionnelles</div>
-        <Field name="institution" label="Institution / Organisme" placeholder="Préfecture du Val-d'Oise" />
+        <Field name="institution" label="Institution / Organisme" placeholder="Préfecture du Val-d'Oise"
+          value={form.institution} error={errors.institution} onChange={handleChange('institution')} />
         <div className={styles.row}>
-          <Field name="email" label="Email" type="email" placeholder="contact@institution.fr" />
-          <Field name="telephone" label="Téléphone" type="tel" placeholder="01 XX XX XX XX" />
+          <Field name="email" label="Email" type="email" placeholder="contact@institution.fr"
+            value={form.email} error={errors.email} onChange={handleChange('email')} />
+          <Field name="telephone" label="Téléphone" type="tel" placeholder="01 XX XX XX XX"
+            value={form.telephone} error={errors.telephone} onChange={handleChange('telephone')} />
         </div>
-        <Field name="ligne_directe" label="Ligne directe" required={false} type="tel" placeholder="01 XX XX XX XX" />
+        <Field name="ligne_directe" label="Ligne directe" required={false} type="tel"
+          placeholder="01 XX XX XX XX"
+          value={form.ligne_directe} error={errors.ligne_directe} onChange={handleChange('ligne_directe')} />
 
         <div className={styles.sectionTitle}>Adresse postale</div>
-        <Field name="adresse" label="Adresse complète" placeholder="12 rue de la Paix, 95000 Cergy" />
+        <Field name="adresse" label="Adresse complète" placeholder="12 rue de la Paix, 95000 Cergy"
+          value={form.adresse} error={errors.adresse} onChange={handleChange('adresse')} />
 
         <button className={styles.btn} onClick={handleSubmit} disabled={loading}>
           {loading ? 'Enregistrement en cours...' : 'Confirmer mon inscription →'}
