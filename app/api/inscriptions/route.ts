@@ -35,7 +35,15 @@ export async function POST(request: NextRequest) {
     })
 
     // Notification email en arrière-plan (ne bloque pas la réponse)
-    sendNotificationEmail(inscription)
+   sendNotificationEmail({
+  nom: inscription.nom,
+  prenom: inscription.prenom,
+  institution: inscription.institution,
+  email: inscription.email,
+  telephone: inscription.telephone,
+  adresse: inscription.adresse,
+  ligne_directe: inscription.ligne_directe,
+})
 
     return NextResponse.json({ success: true, inscription }, { status: 201 })
   } catch (err) {
