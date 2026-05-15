@@ -1,0 +1,20 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Rethink Sans', sans-serif;
+  background: #f5f0f2;
+  min-height: 100vh;
+  color: #1a0a10;
+}
+
+:root {
+  --bordeaux: #460525;
+  --bordeaux-light: #6b0a38;
+  --bordeaux-pale: #f9f0f4;
+  --bordeaux-border: #d4a0b5;
+  --gold: #c9a84c;
+}
