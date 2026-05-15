@@ -56,10 +56,8 @@
 .heroBg {
   position: absolute;
   inset: 0;
+  background: #460525;
   background-image: url('/fond3.jpg');
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
 }
 .heroOverlay {
   position: absolute;
