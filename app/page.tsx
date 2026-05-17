@@ -69,7 +69,7 @@ export default function Home() {
               </div>
               <div className={styles.ctaCenter}>
                 <button className={styles.heroCta} style={{ background: 'var(--bordeaux)', color: 'white' }} onClick={() => setView('form')}>
-                  S'inscrire gratuitement →
+                  S'inscrire →
                 </button>
               </div>
             </section>
