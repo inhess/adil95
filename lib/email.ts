@@ -1,4 +1,4 @@
-export async function await sendNotificationEmail(inscription: {
+export async function  sendNotificationEmail(inscription: {
   nom: string
   prenom: string
   institution: string
