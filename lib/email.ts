@@ -1,4 +1,4 @@
-export async function  sendNotificationEmail(inscription: {
+export async function sendNotificationEmail(inscription: {
   nom: string
   prenom: string
   institution: string
@@ -12,7 +12,6 @@ export async function  sendNotificationEmail(inscription: {
   const MJ_SECRET = process.env.MAILJET_SECRET_KEY
   const fromEmail = process.env.FROM_EMAIL
 
-  // Logs de debug
   console.log('=== EMAIL DEBUG ===')
   console.log('NOTIF_EMAIL:', notifEmail || 'MANQUANT')
   console.log('FROM_EMAIL:', fromEmail || 'MANQUANT')
@@ -77,17 +76,14 @@ function buildConfirmationHtml(i: {
     <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;">
       <tr>
         <td style="background:#460525;padding:40px 48px;text-align:center;">
-          <p style="margin:0 0 10px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.55);">ADIL 95</p>
           <h1 style="margin:0;font-size:26px;font-weight:800;color:#ffffff;">Inscription confirmée !</h1>
-          <p style="margin:10px 0 0;font-size:15px;color:rgba(255,255,255,0.7);">Inauguration des nouveaux locaux</p>
         </td>
       </tr>
       <tr>
         <td style="padding:40px 48px;">
           <p style="margin:0 0 18px;font-size:16px;color:#2a0316;">Bonjour <strong>${i.prenom} ${i.nom}</strong>,</p>
           <p style="margin:0 0 28px;font-size:15px;color:#5a3a44;line-height:1.7;">
-            Nous avons bien reçu votre inscription à l'inauguration des nouveaux locaux de l'ADIL 95.
-            Nous serions ravis de vous accueillir lors de cet événement.
+            Nous avons bien reçu votre inscription pour participer à l'inauguration des nouveaux espaces de l'ADIL 95.
           </p>
           <table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf5f8;border:1px solid #f0d8e4;border-radius:12px;margin-bottom:28px;">
             <tr><td style="padding:24px 28px;">
@@ -112,8 +108,8 @@ function buildConfirmationHtml(i: {
               </table>
             </td></tr>
           </table>
-          <p style="margin:0 0 6px;font-size:15px;color:#5a3a44;line-height:1.7;">En cas de question, n'hésitez pas à nous contacter.</p>
-          <p style="margin:0;font-size:15px;color:#5a3a44;line-height:1.7;">À très bientôt,<br><strong style="color:#460525;">L'équipe ADIL 95</strong></p>
+          <p style="margin:0 0 6px;font-size:15px;color:#5a3a44;line-height:1.7;">Une question ? Contactez nous au <strong>01 30 32 97 20</strong></p>
+          <p style="margin:24px 0 0;font-size:15px;color:#5a3a44;line-height:1.7;">À très bientôt,<br><strong style="color:#460525;">L'équipe de l'ADIL 95</strong></p>
         </td>
       </tr>
       <tr>
