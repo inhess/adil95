@@ -33,14 +33,10 @@ export default function Home() {
               <div className={styles.heroBg} />
               <div className={styles.heroOverlay} />
               <img src="/logo.png" className={styles.heroLogo} alt="ADIL 95" />
-              <div className={styles.heroBadge}>✦ Inauguration officielle</div>
-              <h1 className={styles.heroTitle}>Inauguration des nouveaux locaux de l'ADIL 95</h1>
+              <h1 className={styles.heroTitle}>✦ Inauguration officielle</h1>
               <p className={styles.heroSub}>
-                Rejoignez-nous pour célébrer l'ouverture de nos nouveaux espaces dédiés à l'information sur le logement dans le Val-d'Oise.
+                 Venez découvrir nos nouveaux espaces rénovés à l’occasion d’une inauguration conviviale dédiée à nos partenaires et acteurs du logement dans le Val-d’Oise.
               </p>
-              <button className={styles.heroCta} onClick={() => setView('form')}>
-                S'inscrire à l'événement →
-              </button>
             </div>
 
             {/* INFO CARDS */}
@@ -61,10 +57,10 @@ export default function Home() {
                 ))}
               </div>
               <div className={styles.aboutBlock}>
-                <div className={styles.aboutTitle}>À propos de l'ADIL 95</div>
+                <div className={styles.aboutTitle}>Invitation</div>
                 <p className={styles.aboutText}>
-                  L'ADIL 95 offre des conseils juridiques, financiers et fiscaux gratuits et impartiaux à tous les habitants du Val-d'Oise.
-                  Après des travaux d'aménagement, nous vous invitons à découvrir nos nouveaux locaux lors de cette journée d'inauguration conviviale et institutionnelle.
+                  Alexandre PUEYO, Président de l’ADIL95, et sa Directrice, Nawal BENCHENAA, ont le plaisir de vous convier à l’inauguration des locaux 
+                  de l’association, rénovés à la suite de travaux d’aménagement et de modernisation.
                 </p>
               </div>
               <div className={styles.ctaCenter}>
