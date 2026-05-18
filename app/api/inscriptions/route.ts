@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Notification email en arrière-plan (ne bloque pas la réponse)
-   sendNotificationEmail({
+  await sendNotificationEmail({
   nom: inscription.nom,
   prenom: inscription.prenom,
   institution: inscription.institution,
