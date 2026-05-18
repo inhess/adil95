@@ -33,7 +33,7 @@ export default function Home() {
               <div className={styles.heroBg} />
               <div className={styles.heroOverlay} />
               <img src="/logo.png" className={styles.heroLogo} alt="ADIL 95" />
-              <h1 className={styles.heroTitle}>✦ Inauguration officielle</h1>
+              <h1 className={styles.heroTitle}>✦ Inauguration officielle ✦</h1>
               <p className={styles.heroSub}>
                  Venez découvrir nos nouveaux espaces rénovés à l’occasion d’une inauguration conviviale dédiée à nos partenaires et acteurs du logement dans le Val-d’Oise.
               </p>
