@@ -123,7 +123,7 @@ export default function FormPage({ onBack }: Props) {
       <div className={styles.header}>
         <img src="/logo.png" className={styles.logo} alt="ADIL 95" />
         <h1 className={styles.title}>Formulaire d'inscription</h1>
-        <p className={styles.subtitle}>Inauguration des nouveaux locaux — 26 juin 2026 à 16h00</p>
+        <p className={styles.subtitle}>Inauguration — Vendredi 26 juin 2026 à 16h00</p>
       </div>
 
       <div className={styles.card}>
