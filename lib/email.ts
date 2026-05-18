@@ -8,53 +8,129 @@ export async function sendNotificationEmail(inscription: {
   ligne_directe?: string
 }) {
   const notifEmail = process.env.NOTIF_EMAIL
-  if (!notifEmail) return // pas de notif configurée
+  if (!notifEmail) return
+
+  const MJ_KEY = process.env.MAILJET_API_KEY
+  const MJ_SECRET = process.env.MAILJET_SECRET_KEY
+  if (!MJ_KEY || !MJ_SECRET) {
+    console.error('Clés Mailjet manquantes dans .env')
+    return
+  }
+
+  const credentials = Buffer.from(`${MJ_KEY}:${MJ_SECRET}`).toString('base64')
 
   try {
-    // Option Resend (recommandé)
-    if (process.env.RESEND_API_KEY) {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'ADIL 95 <noreply@adil95.fr>',
-          to: [notifEmail],
-          subject: `🎉 Nouvelle inscription — ${inscription.prenom} ${inscription.nom}`,
-          html: buildEmailHtml(inscription),
-        }),
-      })
-      return
-    }
-
-    // Option Nodemailer / SMTP
-    if (process.env.SMTP_HOST) {
-      const nodemailer = await import('nodemailer')
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: false,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      })
-      await transporter.sendMail({
-        from: `"ADIL 95" <${process.env.SMTP_USER}>`,
-        to: notifEmail,
-        subject: `🎉 Nouvelle inscription — ${inscription.prenom} ${inscription.nom}`,
-        html: buildEmailHtml(inscription),
-      })
-    }
+    await fetch('https://api.mailjet.com/v3.1/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${credentials}`,
+      },
+      body: JSON.stringify({
+        Messages: [
+          // ── 1. Email de confirmation au participant ──────────────────
+          {
+            From: { Email: process.env.FROM_EMAIL || notifEmail, Name: 'ADIL 95' },
+            To: [{ Email: inscription.email, Name: `${inscription.prenom} ${inscription.nom}` }],
+            Subject: '✅ Confirmation de votre inscription — Inauguration ADIL 95',
+            HTMLPart: buildConfirmationHtml(inscription),
+          },
+          // ── 2. Notification à l'admin ────────────────────────────────
+          {
+            From: { Email: process.env.FROM_EMAIL || notifEmail, Name: 'ADIL 95' },
+            To: [{ Email: notifEmail, Name: 'Admin ADIL 95' }],
+            Subject: `🔔 Nouvelle inscription — ${inscription.prenom} ${inscription.nom} (${inscription.institution})`,
+            HTMLPart: buildNotifHtml(inscription),
+          },
+        ],
+      }),
+    })
   } catch (err) {
-    console.error('Erreur envoi email:', err)
+    console.error('Erreur envoi email Mailjet:', err)
     // On ne bloque pas l'inscription si l'email échoue
   }
 }
 
-function buildEmailHtml(i: {
+// ── Email de confirmation au participant ─────────────────────────────────────
+function buildConfirmationHtml(i: {
+  nom: string; prenom: string; institution: string
+  email: string; telephone: string; adresse: string; ligne_directe?: string
+}) {
+  return `
+<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#f5f0f2;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f0f2;padding:40px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;">
+
+      <tr>
+        <td style="background:#460525;padding:40px 48px;text-align:center;">
+          <p style="margin:0 0 10px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.55);">ADIL 95</p>
+          <h1 style="margin:0;font-size:26px;font-weight:800;color:#ffffff;">Inscription confirmée !</h1>
+          <p style="margin:10px 0 0;font-size:15px;color:rgba(255,255,255,0.7);">Inauguration des nouveaux locaux</p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:40px 48px;">
+          <p style="margin:0 0 18px;font-size:16px;color:#2a0316;">Bonjour <strong>${i.prenom} ${i.nom}</strong>,</p>
+          <p style="margin:0 0 28px;font-size:15px;color:#5a3a44;line-height:1.7;">
+            Nous avons bien reçu votre inscription à l'inauguration des nouveaux locaux de l'ADIL 95.
+            Nous serions ravis de vous accueillir lors de cet événement.
+          </p>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#fdf5f8;border:1px solid #f0d8e4;border-radius:12px;margin-bottom:28px;">
+            <tr><td style="padding:24px 28px;">
+              <p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9b3060;">DÉTAILS DE L'ÉVÉNEMENT</p>
+              <table width="100%">
+                <tr>
+                  <td style="padding:5px 0;font-size:14px;color:#7a3050;width:30%;">📅 Date</td>
+                  <td style="padding:5px 0;font-size:14px;font-weight:700;color:#2a0316;">Vendredi 26 juin 2026</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 0;font-size:14px;color:#7a3050;">🕓 Heure</td>
+                  <td style="padding:5px 0;font-size:14px;font-weight:700;color:#2a0316;">À partir de 16h00</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 0;font-size:14px;color:#7a3050;vertical-align:top;">📍 Lieu</td>
+                  <td style="padding:5px 0;font-size:14px;font-weight:700;color:#2a0316;line-height:1.6;">
+                    La Croix Saint-Sylvère<br>
+                    Rue des châteaux Saint-Sylvère, Bât G<br>
+                    95000 Cergy
+                  </td>
+                </tr>
+              </table>
+            </td></tr>
+          </table>
+
+          <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9b3060;">VOTRE INSCRIPTION</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #f0d8e4;margin-bottom:32px;">
+            <tr><td style="padding:9px 0;font-size:13px;color:#7a3050;border-bottom:1px solid #f5eef2;width:40%;">Nom</td><td style="padding:9px 0;font-size:13px;color:#2a0316;border-bottom:1px solid #f5eef2;">${i.prenom} ${i.nom}</td></tr>
+            <tr><td style="padding:9px 0;font-size:13px;color:#7a3050;border-bottom:1px solid #f5eef2;">Institution</td><td style="padding:9px 0;font-size:13px;color:#2a0316;border-bottom:1px solid #f5eef2;">${i.institution}</td></tr>
+            <tr><td style="padding:9px 0;font-size:13px;color:#7a3050;">Email</td><td style="padding:9px 0;font-size:13px;color:#2a0316;">${i.email}</td></tr>
+          </table>
+
+          <p style="margin:0 0 6px;font-size:15px;color:#5a3a44;line-height:1.7;">En cas de question, n'hésitez pas à nous contacter.</p>
+          <p style="margin:0;font-size:15px;color:#5a3a44;line-height:1.7;">À très bientôt,<br><strong style="color:#460525;">L'équipe ADIL 95</strong></p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#f5f0f2;padding:20px 48px;text-align:center;border-top:1px solid #ead8e4;">
+          <p style="margin:0;font-size:12px;color:#9a7585;">Agence Départementale d'Information sur le Logement du Val-d'Oise</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`
+}
+
+// ── Email de notification admin ──────────────────────────────────────────────
+function buildNotifHtml(i: {
   nom: string; prenom: string; institution: string
   email: string; telephone: string; adresse: string; ligne_directe?: string
 }) {
@@ -77,6 +153,5 @@ function buildEmailHtml(i: {
     <div style="background:#f9f0f4;padding:14px 24px;font-size:12px;color:#999;">
       ADIL 95 — Système d'inscription automatique
     </div>
-  </div>
-  `
+  </div>`
 }
